@@ -14,13 +14,13 @@ except FileExistsError:
 logger = logging.getLogger('app.main')
 
 # Задаем требуемое форматирование
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(module)s - %(message)s ")
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(module)s : %(message)s ")
 
 # Пробуем писать лог, ротирование каждую минуту (для теста), используем заданный формат лога.
 # Если сущуествует каталог с именем server.log, то выдаем в консоль ошибку о невозможности создать файл.
 try:
     rot_hand = handlers.logging.handlers.TimedRotatingFileHandler(
-        'log/server.log', when='m', interval=1,
+        'log/server.log', when='D', interval=1,
         encoding='utf-8',
         backupCount=10
     )

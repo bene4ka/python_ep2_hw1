@@ -5,11 +5,42 @@ import json
 import argparse
 from socket import *
 import logging
+import inspect
 import server_log_config
 
 logger = logging.getLogger('app.main')
 
 
+class Log():
+    """
+    Class of decorator, Used to log functions calls.
+    """
+    def __init__(self):
+        pass
+
+    # Магический метод __call__ позволяет обращаться к
+    # объекту класса, как к функции
+    def __call__(self, func):
+        def decorated(*args, **kwargs):
+            def whosdaddy():
+                """
+                Returns name or the caller funtion.
+                :return: caller function name.
+                """
+                return inspect.stack()[2][3]
+
+            res = func(*args, **kwargs)
+            logger.debug(
+                'Function {} with args {}, kwargs {} = {} was called '
+                'from function {}.'.format(
+                    func.__name__, args, kwargs, res, whosdaddy())
+            )
+            return res
+
+        return decorated
+
+
+@Log()
 def arguments():
     """
     Принимает аргументы командной строки [p, n, v], где:
@@ -54,6 +85,7 @@ def arguments():
     return [port, address]
 
 
+@Log()
 def sock_bind(args):
     """"
     Создает TCP-сокет и присваает порт и интерфейс, полученный из функции arguments()
@@ -71,6 +103,7 @@ def sock_bind(args):
     return s
 
 
+@Log()
 def receiver(data, addr):
     """
     Получает принятые данные и анализирует. Если это presence сообщение от залогинившегося пользователя, посылает ему
@@ -91,6 +124,7 @@ def receiver(data, addr):
     return resp
 
 
+@Log()
 def listen(s):
     """
     Ожидает сообщения от клиента, передает их в декодированном виде в receiver(), для анализа и

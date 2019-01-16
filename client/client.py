@@ -6,11 +6,42 @@ import time
 import json
 import argparse
 import logging
+import inspect
 import client_log_config
 
 logger = logging.getLogger('app.main')
 
 
+class Log():
+    """
+    Class of decorator, Used to log functions calls.
+    """
+    def __init__(self):
+        pass
+
+    # Магический метод __call__ позволяет обращаться к
+    # объекту класса, как к функции
+    def __call__(self, func):
+        def decorated(*args, **kwargs):
+            def whosdaddy():
+                """
+                Returns name or the caller funtion.
+                :return: caller function name.
+                """
+                return inspect.stack()[2][3]
+
+            res = func(*args, **kwargs)
+            logger.debug(
+                'Function {} with args {}, kwargs {} = {} was called '
+                'from function {}.'.format(
+                    func.__name__, args, kwargs, res, whosdaddy())
+            )
+            return res
+
+        return decorated
+
+
+@Log()
 def arguments():
     """
     Принимает аргументы командной строки [ip, p, v], где:
@@ -48,6 +79,7 @@ def arguments():
     return [port, address]
 
 
+@Log()
 def sock_conn(args):
     """"
     Создает TCP-сокет и подключается к порту и адресу, получеными из функции arguments()
@@ -64,6 +96,7 @@ def sock_conn(args):
     return s
 
 
+@Log()
 def send_message(s, action_key='presence', type_key='status', user_key='Guest', status_key='I am here!'):
     """
     Создает словарь с ключами action, type, user, затем в формате JSON и кодировке utf-8 отправляет сообщение
