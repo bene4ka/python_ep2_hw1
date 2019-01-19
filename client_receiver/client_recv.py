@@ -44,7 +44,7 @@ def arguments():
     :return: лист, где первым элементом является порт, а вторым - IP для подключения.
     """
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-ip', default='127.0.0.1', metavar='<ip>', help='Server IP address', type=str)
+    parser.add_argument('ip', default='127.0.0.1', metavar='<ip>', help='Server IP address', type=str)
     parser.add_argument('-p', default='7777', help='port of remote server', type=int)
     parser.add_argument('-v', default=1, help='verbose level', type=int)
     parsed_opts = parser.parse_args()
